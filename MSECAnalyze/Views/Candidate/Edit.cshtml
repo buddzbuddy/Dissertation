@@ -1,0 +1,97 @@
+﻿@model Domain.Entities.Candidate
+
+@{
+    ViewBag.Title = "Редактированиие кандидата";
+}
+@section heads{
+@Styles.Render("~/bundles/leaflet/base/css", "~/bundles/leaflet/awesome-markers/css")
+<style>
+    #MarkerColor li {
+        position: relative;
+        display: inline-block;
+        border: 1px solid grey;
+    }
+
+        #MarkerColor li:hover {
+            cursor: pointer;
+            border: 1px solid black;
+        }
+</style>
+}
+<h2>Редактированиие кандидата</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Кандидат</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.PersonId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @{Html.RenderAction("ShowPartial", "Person", new { Id = Model.PersonId.Value });}
+                @Html.HiddenFor(model => model.PersonId)
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.MarkerType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.HiddenFor(model => model.MarkerType)
+                <ul id="MarkerColor">
+                    <li class="awesome-marker awesome-marker-icon-beige" id="beige"></li>
+                    <li class="awesome-marker awesome-marker-icon-black" id="black"></li>
+                    <li class="awesome-marker awesome-marker-icon-blue" id="blue"></li>
+                    <li class="awesome-marker awesome-marker-icon-cadetblue" id="cadetblue"></li>
+                    <li class="awesome-marker awesome-marker-icon-darkblue" id="darkblue"></li>
+                    <li class="awesome-marker awesome-marker-icon-darkgreen" id="darkgreen"></li>
+                    <li class="awesome-marker awesome-marker-icon-darkpurple" id="darkpurple"></li>
+                    <li class="awesome-marker awesome-marker-icon-darkred" id="darkred"></li>
+                    <li class="awesome-marker awesome-marker-icon-gray" id="gray"></li>
+                    <li class="awesome-marker awesome-marker-icon-green" id="green"></li>
+                    <li class="awesome-marker awesome-marker-icon-lightblue" id="lightblue"></li>
+                    <li class="awesome-marker awesome-marker-icon-lightgray" id="lightgray"></li>
+                    <li class="awesome-marker awesome-marker-icon-lightgreen" id="lightgreen"></li>
+                    <li class="awesome-marker awesome-marker-icon-lightred" id="lightred"></li>
+                    <li class="awesome-marker awesome-marker-icon-orange" id="orange"></li>
+                    <li class="awesome-marker awesome-marker-icon-pink" id="pink"></li>
+                    <li class="awesome-marker awesome-marker-icon-purple" id="purple"></li>
+                    <li class="awesome-marker awesome-marker-icon-red" id="red"></li>
+                    <li class="awesome-marker awesome-marker-icon-white" id="white"></li>
+                </ul>
+                @Html.ValidationMessageFor(model => model.MarkerType, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Сохранить" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+<div>
+    @Html.ActionLink("Отмена", "Show", new { Id = Model.Id })
+</div>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#MarkerColor li').each(function (i, item) {
+                if ('@Model.MarkerType' == $(this).attr('id'))
+                    $(item).css('border', '1px solid black');
+            });
+            $('#MarkerColor li').click(function () {
+                $('#MarkerColor li').each(function (i, item) {
+                    $(item).css('border', '1px solid grey');
+                });
+                $(this).css('border', '1px solid black');
+                $('#MarkerType').val($(this).attr('id'));
+            });
+        });
+    </script>
+}

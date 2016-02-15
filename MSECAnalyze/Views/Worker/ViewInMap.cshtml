@@ -1,0 +1,82 @@
+﻿@model MSECAnalyze.Models.WorkerViewModel
+
+@{
+    ViewBag.Title = "Просмотр работника штаба";
+}
+@section heads {
+    @Styles.Render("~/bundles/leaflet/base/css", "~/bundles/leaflet/label/css")
+}
+
+<h2>Просмотр работника штаба</h2>
+
+<div id="canvas" style="height: 500px; width:600px;float:right"></div>
+<fieldset>
+    <legend>Работник штаба</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Worker.PersonId)
+    </div>
+    <div class="display-field">
+        @if(Model.Worker.PersonId.HasValue)
+        {
+            Html.RenderAction("ShowPartial", "Person", new { Id = Model.Worker.PersonId });
+        }
+    </div>
+
+</fieldset>
+<h3>Сводная информация</h3>
+<hr />
+<p>Кол-во домов: @ViewBag.HouseCount</p>
+<p>Кол-во избирателей: @ViewBag.VoterCount</p>
+<p>Кол-во полит. взглядов: @ViewBag.PolitViewCount</p>
+<img src="@Url.Action("Worker", "Chart", new { Id = Model.Worker.Id })" />
+<hr />
+@Html.ActionLink("Назад", "Show", new { Id = Model.Worker.Id })
+
+<!--Устанавливаем секцию scripts, которая затем будет рендериться на мастер-странице -->
+@section scripts {
+    <script type="text/javascript">
+
+    $(document).ready(function () {
+        GetMap2();
+    });
+    function GetMap2() {
+        var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        osm = L.tileLayer(osmUrl, { maxZoom: 18, attribution: osmAttrib });
+        map = new L.Map('canvas', { layers: [osm], center: new L.LatLng(42.874722, 74.612222), zoom: 13 });
+        var latlngs = [];
+        $.getJSON('@(Url.Action("GetData", new { Id = Model.Worker.Id }))', function (data) {
+                $(data).each(function (i, item) {
+                    var latlng = L.latLng(item.Latitude, item.Longitude);
+                    var marker = L.marker(latlng, { id: item.Id }).bindPopup(L.popup().setContent("<div class='message-info'><b>Дом № " + item.Name + "</b><hr style='margin-bottom:0px;' />"
+                                + "<br />Всего избирателей: " + item.VoterCount
+                                + "<br />Политические взгляды:"
+                                + drawParties(item.Parties)
+                                + (item.Parties.length ? ("<img src='@Url.Action("House", "Chart")/" + item.Id + "' src='' alt='Диаграмма' />") : "")
+                                + "</div>"/*'Marker Id:' + item.Id*/)).bindLabel("<i>" + item.Name + "</i>", {
+                                    noHide: true
+                                }).addTo(map);
+                    latlngs.push(latlng);
+                });
+                console.log(latlngs);
+                map.fitBounds(L.latLngBounds(latlngs));
+            });
+        }
+        function drawParties(parties) {
+            var result = "<ul>";
+
+            var ul = document.createElement('ul');
+            for (var i = 0; i < parties.length; i++) {
+
+                result = result + "<li>" + parties[i].Key + ": " + parties[i].Value
+            }
+
+            return result + "</ul>";
+        }
+
+    </script>
+@Scripts.Render(
+    "~/bundles/leaflet/base/js",
+    "~/bundles/leaflet/label/js")
+}

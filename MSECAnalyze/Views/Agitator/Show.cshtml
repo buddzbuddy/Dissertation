@@ -1,0 +1,39 @@
+﻿@model MSECAnalyze.Models.AgitatorViewModel
+
+@{
+    ViewBag.Title = "Просмотр агитатора";
+}
+
+<h2>Просмотр агитатора</h2>
+<fieldset>
+    <legend>Агитатор</legend>
+
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Agitator.PersonId)
+    </div>
+    <div class="display-field">
+        @if (Model.Agitator.PersonId.HasValue)
+        {
+            Html.RenderAction("ShowPartial", "Person", new { Id = Model.Agitator.PersonId });
+        }
+    </div>
+
+    <h3>Назначенные дома</h3>
+    @Html.ActionLink("Добавить дом", "AddRelatedHouse", new { agitatorId = Model.Agitator.Id })
+    @{
+        Html.RenderPartial("RelatedHouses", Model.RelatedHouses);
+    }
+    <h3>Назначенные УИК</h3>
+    @Html.ActionLink("Добавить УИК", "AddRelatedPrecinct", new { agitatorId = Model.Agitator.Id })
+    @{
+        Html.RenderPartial("RelatedPrecincts", Model.RelatedPrecincts);
+    }
+
+</fieldset>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id=Model.Agitator.Id }) |
+    @Html.ActionLink("Назад к списку", "Index")@if (Model.RelatedHouses.Count > 0 || Model.RelatedPrecincts.Count > 0)
+    {
+        <text>| </text>@Html.ActionLink("Просмотреть на карте", "ViewInMap", new { id = Model.Agitator.Id })
+    }
+</p>

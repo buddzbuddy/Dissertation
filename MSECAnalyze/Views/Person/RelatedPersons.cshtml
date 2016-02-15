@@ -1,0 +1,23 @@
+﻿@model IEnumerable<MSECAnalyze.Models.PersonRelationViewModel>
+<table class="table">
+    <tr>
+        <th>@Html.DisplayNameFor(model => model.Relationship.Type)</th>
+        <th>@Html.DisplayNameFor(model => model.Person.FullName)</th>
+        <th>Действие</th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Relationship.Type)
+        </td>
+        <td>
+            @*@Html.DisplayFor(modelItem => item.Person.FullName)*@
+            @Html.ActionLink(item.Person.FullName, "Show", new { Id = item.Person.Id })
+        </td>
+        <td>
+            @Html.ActionLink("убрать", "RemoveRelatedPerson", new { relationId = item.PersonRelation.Id, currentPersonId = ViewBag.CurrentPersonId })
+        </td>
+    </tr>
+}
+</table>

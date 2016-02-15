@@ -1,0 +1,34 @@
+﻿@model MSECAnalyze.Models.WorkerViewModel
+
+@{
+    ViewBag.Title = "Просмотр работника штаба";
+}
+
+<h2>Просмотр работника штаба</h2>
+
+<fieldset>
+    <legend>Работник штаба</legend>
+    
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Worker.PersonId)
+    </div>
+    <div class="display-field">
+        @if(Model.Worker.PersonId.HasValue)
+        {
+            Html.RenderAction("ShowPartial", "Person", new { Id = Model.Worker.PersonId });
+        }
+    </div>
+
+    <h3>Назначенные дома</h3>
+    @Html.ActionLink("Добавить дом", "AddRelatedHouse", new { workerId = Model.Worker.Id })
+    @{
+        Html.RenderPartial("RelatedHouses", Model.RelatedHouses);
+    }
+
+</fieldset>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Worker.Id }) |
+@Html.ActionLink("Назад", "Index")@if(Model.RelatedHouses.Count > 0){
+    <text>| </text>@Html.ActionLink("Просмотреть на карте", "ViewInMap", new { id = Model.Worker.Id })
+    }
+</p>

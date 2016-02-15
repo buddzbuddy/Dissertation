@@ -1,0 +1,35 @@
+﻿@model Domain.Entities.Worker
+
+@{
+    ViewBag.Title = "Создание работника";
+}
+
+<h2>Создание работника</h2>
+
+@using (Html.BeginForm()) {
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <fieldset>
+        <legend>Работник</legend>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.PersonId)
+        </div>
+        <div class="editor-field">
+            @Html.HiddenFor(model => model.PersonId)
+            @if(Model.PersonId.HasValue)
+            {
+                Html.RenderAction("ShowPartial", "Person", new { Id = Model.PersonId });
+            }
+        </div>
+
+        <p>
+            <input type="submit" value="Создать" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Назад к списку", "Index")
+</div>

@@ -1,0 +1,89 @@
+﻿@model MSECAnalyze.Models.PrecinctViewModel
+
+@{
+    ViewBag.Title = "Просмотр УИК: " + Model.Precinct.Name;
+}
+
+<h2>Просмотр УИК: @Model.Precinct.Name</h2>
+
+<fieldset>
+    <legend>УИК</legend>
+
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Precinct.Name)
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Precinct.Name)
+    </div>
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Precinct.DistrictId)
+    </div>
+    <div class="display-field">
+        @if (Model.District != null)
+        {
+            @Html.ActionLink(Model.District.Name, "Show", "District", new { Id = Model.District.Id }, new { title = "Открыть район" });
+        }
+    </div>
+
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Precinct.WorkerId)
+    </div>
+    <div class="display-field">
+        @if (Model.Worker != null && Model.Worker.PersonId.HasValue)
+        {
+            Html.RenderAction("ShowPartial", "Person", new { Id = Model.Worker.PersonId });
+        }
+    </div>
+</fieldset>
+<br />
+<h5>Позиция на карте</h5>
+@*@Html.ActionLink("Указать на карте", "SetMapPosition", new { id = Model.Precinct.Id })*@
+<table class="entityList">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Precinct.Latitude)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Precinct.Longitude)
+        </th>
+    </tr>
+    @if (Model.Precinct.Latitude.HasValue && Model.Precinct.Longitude.HasValue)
+    {
+        <tr>
+            <td>
+                @Model.Precinct.Latitude
+            </td>
+            <td>
+                @Model.Precinct.Longitude
+            </td>
+        </tr>
+    }
+</table>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id = Model.Precinct.Id }) |
+    @Html.ActionLink("Назад", "Index")
+</p>
+<br />
+<h5>Список домов, относящиеся к данному УИКу</h5>
+@Html.ActionLink("Добавить/Создать дом", "AddHouse", new { Id = Model.Precinct.Id })
+@if (Model.Precinct.Houses.Count > 0)
+{
+    <table class="entityList">
+        <tr>
+            <th>
+            </th>
+            <th>Дом</th>
+        </tr>
+        @foreach (var p in Model.Precinct.Houses)
+        {
+            <tr>
+                <td>
+                    @Html.ActionLink("Открыть", "Show", "House", new { Id = p.Id }, null) |
+                    @Html.ActionLink("Редактировать", "Edit", "House", new { Id = p.Id }, null) |
+                    @Html.ActionLink("Удалить", "Delete", "House", new { Id = p.Id }, null)
+                </td>
+                <td>@p.Name</td>
+            </tr>
+        }
+    </table>
+}

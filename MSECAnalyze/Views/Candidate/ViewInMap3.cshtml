@@ -1,0 +1,92 @@
+﻿@model MSECAnalyze.Models.CandidateViewModel
+
+@{
+    ViewBag.Title = "Просмотр кандидата";
+}
+@section heads {
+    @Styles.Render("~/bundles/leaflet/base/css", "~/bundles/leaflet/label/css")
+}
+
+<h2>Просмотр кандидата: привязанные МТУ</h2>
+@Html.ActionLink("открыть привязанные УИК", "ViewInMap2", new { Id = Model.Candidate.Id })
+
+<div id="canvas" style="height: 500px; width:600px;float:right"></div>
+<fieldset>
+    <legend>Кандидат</legend>
+
+    <div class="display-label">
+         @Html.DisplayNameFor(model => model.Candidate.PersonId)
+    </div>
+    <div class="display-field">
+        @if (Model.Candidate.PersonId.HasValue)
+        {
+            Html.RenderAction("ShowPartial", "Person", new { Id = Model.Candidate.PersonId });
+        }
+    </div>
+
+</fieldset>
+<h3>Сводная информация</h3>
+<hr />
+<p>Кол-во МТУ: @ViewBag.MunicipalityCount</p>
+<p>Кол-во домов: @ViewBag.HouseCount</p>
+<p>Кол-во избирателей: @ViewBag.VoterCount</p>
+<p>Кол-во полит. взглядов: @ViewBag.PolitViewCount</p>
+<img src="@Url.Action("Candidate3", "Chart", new { Id = Model.Candidate.Id })" />
+<hr />
+@Html.ActionLink("Назад", "Show", new { Id = Model.Candidate.Id })
+
+<!--Устанавливаем секцию scripts, которая затем будет рендериться на мастер-странице -->
+@section scripts {
+    <script type="text/javascript">
+
+    $(document).ready(function () {
+        GetMap3();
+    });
+
+    function GetMap3() {
+        var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        osm = L.tileLayer(osmUrl, { maxZoom: 18, attribution: osmAttrib });
+        map = new L.Map('canvas', { layers: [osm], center: new L.LatLng(42.874722, 74.612222), zoom: 13 });
+        $.getJSON('@(Url.Action("GetData3", new { Id = Model.Candidate.Id }))', function (data) {
+                var latlngs = [];
+                $(data).each(function (i, p) {
+                    $(p.Items).each(function (i1, item) {
+                        latlngs.push(L.latLng(item.Latitude, item.Longitude));
+                    });
+                    var polygon = L.polygon(latlngs,
+                        {
+                            color: 'red',
+                            weight: 3,
+                            opacity: 0.5,
+                            smoothFactor: 1,
+                            id: p.Id
+                        }).bindPopup(L.popup().setContent("<div class='message-info'><b>МТУ № " + p.Name + "</b><hr style='margin-bottom:0px;' />"
+                                    + "<br />Всего избирателей: " + p.VoterCount
+                                    + "<br />Политические взгляды:"
+                                    + drawParties(p.Parties)
+                                    + (p.Parties.length ? ("<img src='@Url.Action("Municipality", "Chart")/" + p.Id + "' alt='Диаграмма' />") : "")
+                                    + "</div>")).bindLabel('МТУ <br/><b>' + p.Name + '</b>').addTo(map);
+
+                });
+                map.fitBounds(L.latLngBounds(latlngs));
+            });
+        }
+
+        function drawParties(parties) {
+            var result = "<ul>";
+
+            var ul = document.createElement('ul');
+            for (var i = 0; i < parties.length; i++) {
+
+                result = result + "<li>" + parties[i].Key + ": " + parties[i].Value
+            }
+
+            return result + "</ul>";
+        }
+
+</script>
+@Scripts.Render(
+    "~/bundles/leaflet/base/js",
+    "~/bundles/leaflet/label/js")
+}

@@ -1,0 +1,35 @@
+﻿@model IEnumerable<Domain.Entities.Worker>
+
+@{
+    ViewBag.Title = "Список работников штаба";
+}
+
+<h2>Список работников штаба</h2>
+
+<p>
+    @Html.ActionLink("Создать новый", "Create")
+</p>
+<table class="entityList">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.PersonId)
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.ActionLink("Открыть", "Show", new { id = item.Id })
+            </td>
+            <td>
+                @if (item.PersonId.HasValue)
+                {
+                    Html.RenderAction("ShowFullName", "Person", new { Id = item.PersonId });
+                }
+            </td>
+        </tr>
+    }
+
+</table>

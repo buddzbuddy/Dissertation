@@ -1,0 +1,44 @@
+﻿@using MSECAnalyze.Helpers
+@model IEnumerable<Domain.Entities.Person>
+
+@{
+    ViewBag.Title = "Список граждан";
+}
+
+<h2>Список граждан</h2>
+
+<p>
+    @Html.ActionLink("Создать нового гражданина", "Create")
+</p>
+<table class="entityList">
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.FullName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Years)
+        </th>
+    </tr>
+    
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.ActionLink("Редактировать", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Открыть", "Show", new { id = item.Id }) |
+                @Html.ActionLink("Удалить", "Delete", new { id = item.Id })
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Years)
+            </td>
+        </tr>
+    }
+
+</table>
+<div style="text-align:center;">
+    @Html.Pager((int)ViewBag.ItemsCount, (int)ViewBag.PageSize)
+</div>

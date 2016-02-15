@@ -1,0 +1,47 @@
+﻿@model MSECAnalyze.Models.CandidateViewModel
+
+@{
+    ViewBag.Title = "Просмотр кандидата";
+}
+@section heads{
+    @Styles.Render("~/bundles/leaflet/base/css", "~/bundles/leaflet/awesome-markers/css")
+}
+<h2>Просмотр кандидата</h2>
+<fieldset>
+    <legend>Кандидат</legend>
+
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Candidate.PersonId)
+    </div>
+    <div class="display-field">
+        @if (Model.Candidate.PersonId.HasValue)
+        {
+            Html.RenderAction("ShowPartial", "Person", new { Id = Model.Candidate.PersonId });
+        }
+    </div>
+
+    <div class="display-label">
+        @Html.DisplayNameFor(model => model.Candidate.MarkerType)
+    </div>
+    <div class="display-field">
+        <ul><li class="awesome-marker awesome-marker-icon-@Model.Candidate.MarkerType" style="position:relative"></li></ul>
+    </div>
+    <h3>Назначенные УИК</h3>
+    @Html.ActionLink("Добавить УИК", "AddRelatedPrecinct", new { candidateId = Model.Candidate.Id })
+    @{
+        Html.RenderPartial("RelatedPrecincts", Model.RelatedPrecincts);
+    }
+    <h3>Назначенные МТУ</h3>
+    @Html.ActionLink("Добавить МТУ", "AddRelatedMunicipality", new { candidateId = Model.Candidate.Id })
+    @{
+        Html.RenderPartial("RelatedMunicipalities", Model.RelatedMunicipalities);
+    }
+
+</fieldset>
+<p>
+    @Html.ActionLink("Редактировать", "Edit", new { id=Model.Candidate.Id }) |
+    @Html.ActionLink("Назад к списку", "Index")@if (Model.RelatedPrecincts.Count > 0 || Model.RelatedMunicipalities.Count > 0)
+    {
+        <text>| </text>@Html.ActionLink("Просмотреть на карте", "ViewInMap2", new { id = Model.Candidate.Id })
+    }
+</p>
